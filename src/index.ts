@@ -4,7 +4,7 @@ async function handleRequest(request: Request): Promise<Response> {
 	try {
 		const url = new URL(request.url);
 
-		const path_regex = /^\/(https?:\/\/[^/]+)(\/.*)$/;
+		const path_regex = /^\/https?%3A%2F%2F/;
 
 		// 如果访问根目录，返回HTML
 		if (!path_regex.test(url.pathname)) {
