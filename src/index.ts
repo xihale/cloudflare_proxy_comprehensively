@@ -120,12 +120,13 @@ async function handleHtmlContent(
 	let decoder = new TextDecoder('utf-8', { fatal: false, ignoreBOM: true });
 	let res = decoder.decode(arrayBuffer);
 
-	if(res.includes("charset=gb2312")) {
+	const gb2312_reg = /charset(.*)gb2312/g;
+
+	if (gb2312_reg.test(res)) {
 		decoder = new TextDecoder('gb2312');
 		res = decoder.decode(arrayBuffer);
-		res = res.replace("charset=gb2312", "charset=utf-8"); // modify charset
+		res = res.replace(gb2312_reg, 'charset$1utf-8'); // modify charset to current
 	}
-
 
 	// 为出现的新绝对路径的元素添加 ${protocol}//${host} 前缀
 	const regex = new RegExp(`(href|src)="(https?://.*?)`, 'g');
