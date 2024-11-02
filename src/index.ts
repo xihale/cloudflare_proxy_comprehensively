@@ -5,7 +5,7 @@ async function handleRequest(request: Request): Promise<Response> {
 		const url = new URL(request.url);
 
 		// ^\/https?%3A%2F%2F or ^\/https?://
-		const path_regex = /^\/https?%3A%2F%2F|^\/https?:\//;
+		const path_regex = /^\/https?%3A%2F%2F|^\/https?:\/|^\/\//;
 
 		// 如果访问根目录，返回 default.html
 		if ( url.pathname === '/' ) {
@@ -129,7 +129,7 @@ async function handleHtmlContent(
 	}
 
 	// 为出现的新绝对路径的元素添加 ${protocol}//${host} 前缀
-	const regex = new RegExp(`(href|src)="(https?://.*?)`, 'g');
+	const regex = new RegExp(`(href|src)="((https?:)?//.*?)`, 'g');
 	res = res.replace(regex, `$1="${protocol}//${host}/$2`);
 
 	res = replaceRelativePaths(res, protocol, host, new URL(actualUrlStr).origin);
