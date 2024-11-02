@@ -114,15 +114,26 @@ async function handleHtmlContent(
 	actualUrlStr: string,
 ): Promise<string> {
 
-	let modifiedText = await response.text();
+	// verify charset
+	// try to read as utf-8
+	const arrayBuffer = await response.arrayBuffer();
+	let decoder = new TextDecoder('utf-8', { fatal: false, ignoreBOM: true });
+	let res = decoder.decode(arrayBuffer);
+
+	if(res.includes("charset=gb2312")) {
+		decoder = new TextDecoder('gb2312');
+		res = decoder.decode(arrayBuffer);
+		res = res.replace("charset=gb2312", "charset=utf-8"); // modify charset
+	}
+
 
 	// 为出现的新绝对路径的元素添加 ${protocol}//${host} 前缀
 	const regex = new RegExp(`(href|src)="(https?://.*?)`, 'g');
-	modifiedText = modifiedText.replace(regex, `$1="${protocol}//${host}/$2`);
+	res = res.replace(regex, `$1="${protocol}//${host}/$2`);
 
-	modifiedText = replaceRelativePaths(modifiedText, protocol, host, new URL(actualUrlStr).origin);
+	res = replaceRelativePaths(res, protocol, host, new URL(actualUrlStr).origin);
 
-	return modifiedText;
+	return res;
 }
 
 // 替换 HTML 内容中的相对路径
