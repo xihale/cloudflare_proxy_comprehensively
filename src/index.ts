@@ -4,14 +4,23 @@ async function handleRequest(request: Request): Promise<Response> {
 	try {
 		const url = new URL(request.url);
 
-		const path_regex = /^\/https?%3A%2F%2F/;
+		// ^\/https?%3A%2F%2F or ^\/https?://
+		const path_regex = /^\/https?%3A%2F%2F|^\/https?:\//;
 
-		// 如果访问根目录，返回HTML
-		if (!path_regex.test(url.pathname)) {
+		// 如果访问根目录，返回 default.html
+		if ( url.pathname === '/' ) {
 			return new Response(defaultHtml, {
 				headers: {
 					'Content-Type': 'text/html; charset=utf-8',
 				},
+			});
+		}else if ( !path_regex.test(url.pathname) ) {
+			// redirect to bing.com searching
+			return new Response(null, {
+				status: 302,
+				headers: {
+					'Location': `${url.protocol}//${url.host}/https://www.bing.com/search?q=${url.pathname.slice(1)}`,
+				}
 			});
 		}
 
